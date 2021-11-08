@@ -19,7 +19,7 @@ public class LexicographicallyLargestValidSequence {
 
     private static boolean constructValidSequence(int n, int[] output, boolean[] visited) {
         boolean[] visitedOrig = visited.clone();
-        int[] outputOrig = output.clone();
+//        int[] outputOrig = output.clone();
 
         if (n == 0) {
             return true;
@@ -35,7 +35,7 @@ public class LexicographicallyLargestValidSequence {
                 return true;
             }
             visited = visitedOrig.clone();
-            output = outputOrig.clone();
+//            output = outputOrig.clone();
         }
         return false;
     }
