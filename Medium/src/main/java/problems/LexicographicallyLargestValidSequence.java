@@ -4,9 +4,6 @@ import java.util.Arrays;
 
 // https://leetcode.com/problems/construct-the-lexicographically-largest-valid-sequence/
 public class LexicographicallyLargestValidSequence {
-
-    static int[] output;
-
     public static void main(String[] args) {
         System.out.println(Arrays.toString(minValidSequence(5)));
 
@@ -14,13 +11,13 @@ public class LexicographicallyLargestValidSequence {
 
     private static int[] minValidSequence(int n) {
         int len = 2 * n - 1;
-        output = new int[len];
+        int[] output = new int[len];
         boolean[] visited = new boolean[len];
-        constructValidSequence(n, visited);
+        constructValidSequence(n, output, visited);
         return output;
     }
 
-    private static boolean constructValidSequence(int n, boolean[] visited) {
+    private static boolean constructValidSequence(int n, int[] output, boolean[] visited) {
         boolean[] visitedOrig = visited.clone();
         int[] outputOrig = output.clone();
 
@@ -34,7 +31,7 @@ public class LexicographicallyLargestValidSequence {
             }
             setValues(n, i, output, visited);
 
-            if (constructValidSequence(n - 1,  visited)) {
+            if (constructValidSequence(n - 1, output, visited)) {
                 return true;
             }
             visited = visitedOrig.clone();
