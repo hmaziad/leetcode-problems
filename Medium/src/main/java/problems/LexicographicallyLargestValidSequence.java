@@ -5,55 +5,42 @@ import java.util.Arrays;
 // https://leetcode.com/problems/construct-the-lexicographically-largest-valid-sequence/
 public class LexicographicallyLargestValidSequence {
     public static void main(String[] args) {
-        System.out.println(Arrays.toString(minValidSequence(5)));
+        System.out.println(Arrays.toString(constructDistancedSequence(5)));
 
     }
 
-    private static int[] minValidSequence(int n) {
-        int len = 2 * n - 1;
-        int[] output = new int[len];
-        boolean[] visited = new boolean[len];
-        constructValidSequence(n, output, visited);
-        return output;
+    public static int[] constructDistancedSequence(int n) {
+        int[] ans = new int[n * 2 - 1];
+        boolean[] visited = new boolean[n + 1];
+        calc(0, ans, visited, n);
+        return ans;
     }
 
-    private static boolean constructValidSequence(int n, int[] output, boolean[] visited) {
-        boolean[] visitedOrig = visited.clone();
-//        int[] outputOrig = output.clone();
-
-        if (n == 0) {
+    private static boolean calc(int index, int[] ans, boolean[] visited, int n) {
+        if (index == ans.length) {
             return true;
         }
-
-        for (int i = 0; n > 1 ? i + n < output.length : i < output.length; i++) {
-            if (invalidPosition(i, n, visited)) {
-                continue;
+        if (ans[index] != 0)
+            return calc(index + 1, ans, visited, n); // value already assigned in this position. So go ahead with the next index.
+        else {
+            // we start from n to 1 since we need to find out the lexicographically largest sequence.
+            for (int i = n; i >= 1; i--) {
+                if (visited[i]) continue;
+                visited[i] = true;
+                ans[index] = i;
+                if (i == 1) {
+                    if (calc(index + 1, ans, visited, n)) return true;
+                } else if (index + i < ans.length && ans[index + i] == 0) {
+                    ans[i + index] = i; // assigning the second occurence of i in the desired position i.e, (current index + i )
+                    if (calc(index + 1, ans, visited, n))
+                        return true; // largest possible sequence satisfying the given conditions found.
+                    ans[index + i] = 0;
+                }
+                ans[index] = 0;
+                visited[i] = false;
             }
-            setValues(n, i, output, visited);
 
-            if (constructValidSequence(n - 1, output, visited)) {
-                return true;
-            }
-            visited = visitedOrig.clone();
-//            output = outputOrig.clone();
         }
         return false;
-    }
-
-    private static void setValues(int n, int i, int[] output, boolean[] visited) {
-        if (n == 1) {
-            output[i] = n;
-            visited[i] = true;
-            return;
-        }
-        output[i] = output[i + n] = n;
-        visited[i] = visited[i + n] = true;
-    }
-
-    private static boolean invalidPosition(int i, int n, boolean[] visited) {
-        if (n == 1) {
-            return visited[i];
-        }
-        return visited[i] || visited[i + n];
     }
 }
