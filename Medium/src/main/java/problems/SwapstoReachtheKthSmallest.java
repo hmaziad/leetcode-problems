@@ -1,7 +1,7 @@
 package problems;
 
 import java.math.BigInteger;
-
+// https://leetcode.com/problems/minimum-adjacent-swaps-to-reach-the-kth-smallest-number/
 public class SwapstoReachtheKthSmallest {
 
     public static void main(String[] args) {
