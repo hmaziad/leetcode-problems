@@ -3,13 +3,11 @@ package problems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+// https://leetcode.com/problems/3sum/
 public class ThreeSum {
     public static void main(String[] args) {
 
-//        System.out.println(threeSum(new int[]{-2, 0, 0, 2, 2}));
         System.out.println(threeSum(new int[]{0,0,0,0}));
-//        System.out.println(threeSum(new int[]{-1, 0, 1, 2, -1, -4}));
     }
 
     public static List<List<Integer>> threeSum(int[] nums) {
