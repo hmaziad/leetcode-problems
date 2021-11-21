@@ -41,10 +41,7 @@ public class CheckifThereisaValidPathinaGrid {
         if (grid.length == 1 && grid[0].length == 1) {
             return true;
         }
-
-        for (Direction direction : directionsPerId.get(grid[0][0])) {
-            queue.add(new Next(direction, 0, 0));
-        }
+        directionsPerId.get(grid[0][0]).stream().forEach(direction -> queue.add(new Next(direction, 0, 0));
 
         while (!queue.isEmpty()) {
             if (hasValidPath(queue, grid, directionsPerId)) {
