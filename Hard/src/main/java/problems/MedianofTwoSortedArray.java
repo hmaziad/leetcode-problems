@@ -1,103 +1,112 @@
 package problems;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 // https://leetcode.com/problems/median-of-two-sorted-arrays/
 public class MedianofTwoSortedArray {
     public static void main(String[] args) {
-        findMedianSortedArrays(new int[]{1, 2}, new int[]{3, 4});
+        System.out.println(findMedianSortedArrays(new int[]{1, 2}, new int[]{3, 4}));
     }
 
     public static double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        System.out.println(List.of(nums1.st));
-        return 0;
+        return findMedianSortedArrays(asList(nums1), asList(nums2));
     }
 
-//    private static double findMedianSortedArrays(int[] nums1, int start1, int end1, int[] nums2, int start2, int end2) {
-//
-//        if (nums1.length + nums2.length <= 2) {
-//            getMedian(nums1, nums2);
-//        }
-//
-//        Median median1 = getMedian(nums1, start1, end1);
-//        Median median2 = getMedian(nums2, start2, end2);
-//
-//        int limit1 = getLimit(median1, median2, nums1, start1, end1, median1.value < median2.value);
-//        int limit2 = getLimit(median2, median1, nums2, start2, end2, median2.value < median1.value);
-//
-//        int newStart1 = median1.value < median2.value ? median1.index1 : start1;
-//        int newEnd1 = median1.value < median2.value ? limit1 : start1;
-//
-//
-//        return findMedianSortedArrays(nums1, 0, nums1.length - 1, nums2, 0, nums2.length - 1);
-//    }
-//
-//
-//    private static int getLimit(Median m1, Median limit, int[] nums, int start, int end, boolean refIsMax) {
-//        int left = refIsMax ? m1.index1 : start;
-//        int right = refIsMax ? end : m1.index2;
-//
-//        while (left <= right) {
-//            int middle = left + (right - left) / 2;
-//            if (limitReached(middle, nums, limit,  refIsMax)) {
-//                return middle;
-//            } else if (nums[middle] < limit.value) {
-//                left = refIsMax ? middle + 1 : left;
-//                right = refIsMax ? right : middle - 1;
-//            } else {
-//                left = refIsMax ? left : middle + 1;
-//                right = refIsMax ? middle - 1 : right;
-//            }
-//        }
-//        return 0;
-//    }
-//
-//    private static boolean limitReached(int middle, int[] nums, Median limit, boolean refIsMax) {
-//        if (refIsMax) {
-//            return nums[middle] <= limit.value && (middle == nums.length - 1 || nums[middle + 1] > limit.value);
-//        }
-//        return nums[middle] >= limit.value && (middle == 0 || nums[middle - 1] > limit.value);
-//    }
-//
-//    private static double getMedian(int[] nums1, int[] nums2) {
-//        double med1 = getMedian(nums1, start1, end1).value;
-//        double med2 = getMedian(nums2, start1, end1).value;
-//
-//        if (med1 == 0 || med2 == 0) {
-//            return Math.max(med1, med2);
-//        }
-//        return (med1 + med2) / 2;
-//    }
-//
-//
-//    private static Median getMedian(int[] nums, int start1, int end1) {
-//        int length = nums.length;
-//        if (length <= 1) {
-//            return new Median(length == 1 ? nums[0] : 0, 0, 0, false);
-//        }
-//
-//        boolean isEven = length % 2 == 0;
-//        int i1 = length / 2;
-//        if (isEven) {
-//            int i2 = length / 2 - 1; // so wrong!!
-//            return new Median((nums[i1] + nums[i2]) / 2.0, i2, i1, true);
-//        }
-//
-//        return new Median(nums[i1], i1, i1, false);
-//    }
-//
-//    private static class Median {
-//        double value;
-//        int index1;
-//        int index2;
-//        boolean isEven;
-//
-//        public Median(double value, int index1, int index2, boolean isEven) {
-//            this.value = value;
-//            this.index1 = index1;
-//            this.index2 = index2;
-//            this.isEven = isEven;
-//        }
-//    }
+    public static double findMedianSortedArrays(List<Integer> nums1, List<Integer> nums2) {
+
+        Median m1 = getMedian(nums1);
+        Median m2 = getMedian(nums2);
+
+        if (nums1.size() + nums2.size() <= 2) {
+            return (m1.value + m2.value) / (nums1.isEmpty() || nums2.isEmpty() ? 1 : 2);
+        }
+
+
+        boolean m1Smaller = m1.value < m2.value;
+
+        nums1 = getSublist(nums1, m1, m1Smaller);
+        nums2 = getSublist(nums2, m2, !m1Smaller);
+
+        nums1 = removeMoreThanLimit(nums1, m2.value, m1Smaller);
+        nums2 = removeMoreThanLimit(nums2, m1.value, !m1Smaller);
+
+
+        return findMedianSortedArrays(nums1, nums2);
+    }
+
+    private static List<Integer> getSublist(List<Integer> nums, Median median, boolean numsSmaller) {
+        return numsSmaller ? nums.subList(median.index2, nums.size()) : nums.subList(0, median.index1 + 1);
+    }
+
+    public static List<Integer> removeMoreThanLimit(List<Integer> nums, double limit, boolean numsSmaller) {
+
+        if (nums.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        int left = 0;
+        int right = nums.size();
+        int middle = 0;
+        while (left <= right) {
+            middle = left + (right - left) / 2;
+
+            if (middle >= nums.size()) {
+                break;
+            }
+
+            if (limitReached(middle, nums, numsSmaller, limit)) {
+                return numsSmaller ? nums.subList(0, middle + 1) : nums.subList(middle, nums.size());
+            } else if (nums.get(middle) < limit) {
+                left = middle + 1;
+            } else {
+                right = middle - 1 ;
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    private static boolean limitReached(int middle, List<Integer> nums, boolean numsSmaller, double limit) {
+        if (numsSmaller) {
+            return nums.get(middle) <= limit && (middle == nums.size() - 1 || nums.get(middle + 1) > limit);
+        }
+        return nums.get(middle) >= limit && (middle == 0 || nums.get(middle - 1) < limit);
+    }
+
+    private static List<Integer> asList(int[] nums) {
+        return Arrays.stream(nums).boxed().collect(Collectors.toList());
+    }
+
+    public static Median getMedian(List<Integer> nums) {
+        int length = nums.size();
+        if (length <= 1) {
+            return new Median(length == 1 ? nums.get(0) : 0, 0, 0);
+        }
+
+        boolean isEven = length % 2 == 0;
+        int i1 = length / 2;
+        if (isEven) {
+            int i2 = length / 2 - 1; // so wrong!!
+            return new Median((nums.get(i1) + nums.get(i2)) / 2.0, i2, i1);
+        }
+
+        return new Median(nums.get(i1), i1, i1);
+    }
+
+
+}
+
+class Median {
+    double value;
+    int index1;
+    int index2;
+
+    public Median(double value, int index1, int index2) {
+        this.value = value;
+        this.index1 = index1;
+        this.index2 = index2;
+    }
 }
