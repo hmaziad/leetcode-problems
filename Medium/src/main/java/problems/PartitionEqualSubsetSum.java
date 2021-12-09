@@ -4,38 +4,30 @@ import java.util.Arrays;
 
 public class PartitionEqualSubsetSum {
     public static void main(String[] args) {
-//        System.out.println(canPartition(new int[]{1, 5, 11, 5}));
-//        System.out.println(canPartition(new int[]{1, 2, 3, 5}));
-//        System.out.println(canPartition(new int[]{1, 9, 3, 11}));
-//        System.out.println(canPartition(new int[]{1, 0, 1, 0, 0, 1, 1}));
-//        System.out.println(canPartition(new int[]{3, 3, 3, 9}));
-//        System.out.println(canPartition(new int[]{3}));
-//        System.out.println(canPartition(new int[]{3,4}));
-//        System.out.println(canPartition(new int[]{14, 9, 8, 4, 3, 2}));
 
-//        dynamic programming
-        System.out.println(canPartition(new int[]{23, 13, 11, 7, 6, 5, 5}));
-
+        var main = new PartitionEqualSubsetSum();
+        System.out.println(main.canPartition(new int[]{1, 5, 11, 5}));
     }
 
-    public static boolean canPartition(int[] nums) {
-        int sum1 = Arrays.stream(nums).sum();
-        if (nums.length == 1 || sum1 % 2 == 1) {
+    public boolean canPartition(int[] nums) {
+
+        final int sum = Arrays.stream(nums).sum();
+
+        if (sum % 2 == 1) {
             return false;
         }
-        Arrays.sort(nums);
-        sum1 /= 2;
-        int sum2 = sum1;
 
-        for (int i = nums.length - 1; i >= 0; i--) {
-            int current = nums[i];
-            if (sum1 - current >= 0) {
-                sum1 -= current;
-                continue;
+        final int target = sum / 2;
+        final int len = nums.length;
+
+        final boolean[][] dp = new boolean[len + 1][target + 1];
+        dp[0][0] = true;
+        for (int row = 1; row < dp.length; row++) {
+            for (int col = 1; col < dp[0].length; col++) {
+                dp[row][col] = dp[row - 1][col] || (col - nums[row - 1] >= 0 && dp[row - 1][col - nums[row - 1]]);
             }
-            sum2 -= current;
         }
 
-        return sum1 == 0 && sum2 == 0;
+        return dp[len][target];
     }
 }
